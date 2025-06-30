@@ -1,0 +1,275 @@
+basePath: /api
+definitions:
+  controller.RegisterUserRequest:
+    properties:
+      avatar_url:
+        type: string
+      display_name:
+        type: string
+      email:
+        type: string
+      google_id:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: string
+    required:
+    - display_name
+    - email
+    - user_id
+    type: object
+  controller.RegisterUserResponse:
+    properties:
+      is_new_user:
+        type: boolean
+      message:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.ChatRequest:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/model.GPTMessage'
+        type: array
+      thread_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    required:
+    - messages
+    type: object
+  model.ChatResponse:
+    properties:
+      cached:
+        example: false
+        type: boolean
+      reply:
+        example: Hello! How can I help you with your eye examination today?
+        type: string
+      thread_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+  model.GPTMessage:
+    properties:
+      content:
+        example: Hello, how are you?
+        type: string
+      role:
+        enum:
+        - user
+        - assistant
+        - system
+        example: user
+        type: string
+    required:
+    - content
+    - role
+    type: object
+  model.STTResponse:
+    properties:
+      filename:
+        example: audio.wav
+        type: string
+      text:
+        example: Hello, I would like to book an eye examination
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@eyeqcheck.com
+    name: API Support
+  description: Eye examination consultation API service
+  license:
+    name: MIT
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: EyeQcheck API
+  version: "1.0"
+paths:
+  /conversation/chat:
+    post:
+      consumes:
+      - application/json
+      description: Send messages to AI assistant and get response for eye examination
+        consultation
+      parameters:
+      - description: Chat request with messages and optional thread_id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response with assistant reply
+          schema:
+            $ref: '#/definitions/model.ChatResponse'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Process chat conversation
+      tags:
+      - Conversation
+  /conversation/speech-to-text:
+    post:
+      consumes:
+      - multipart/form-data
+      description: |-
+        Upload audio file and get transcribed text
+        Upload audio file and get transcribed text using Whisper API
+      parameters:
+      - description: Audio file to transcribe
+        in: formData
+        name: audio
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns transcribed text and filename
+          schema:
+            $ref: '#/definitions/model.STTResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Convert speech to text
+      tags:
+      - Conversation
+  /guest/conversation/demo-chat:
+    post:
+      consumes:
+      - application/json
+      description: Limited chat functionality for non-logged-in users (demo/trial)
+      parameters:
+      - description: Demo chat request with limited messages
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Demo response with limited functionality
+          schema:
+            $ref: '#/definitions/model.ChatResponse'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "429":
+          description: Rate limit exceeded
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Demo chat conversation for guests
+      tags:
+      - Demo
+  /guest/conversation/speech-to-text:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Limited speech-to-text functionality for non-logged-in users (demo/trial)
+      parameters:
+      - description: Audio file to transcribe
+        in: formData
+        name: audio
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns transcribed text and filename
+          schema:
+            $ref: '#/definitions/model.STTResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Demo speech-to-text for guests
+      tags:
+      - Demo
+  /public/register-user:
+    post:
+      consumes:
+      - application/json
+      description: Register or update user information from external OAuth system
+        (Google, etc.)
+      parameters:
+      - description: User registration data from OAuth system
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User registered/updated successfully
+          schema:
+            $ref: '#/definitions/controller.RegisterUserResponse'
+        "201":
+          description: New user created successfully
+          schema:
+            $ref: '#/definitions/controller.RegisterUserResponse'
+        "400":
+          description: Invalid request payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register user from external OAuth system
+      tags:
+      - User
+swagger: "2.0"

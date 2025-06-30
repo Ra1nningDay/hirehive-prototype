@@ -1,0 +1,406 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Eye examination consultation API service",
+        "title": "EyeQcheck API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "support@eyeqcheck.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/conversation/chat": {
+            "post": {
+                "description": "Send messages to AI assistant and get response for eye examination consultation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Conversation"
+                ],
+                "summary": "Process chat conversation",
+                "parameters": [
+                    {
+                        "description": "Chat request with messages and optional thread_id",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with assistant reply",
+                        "schema": {
+                            "$ref": "#/definitions/model.ChatResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/conversation/speech-to-text": {
+            "post": {
+                "description": "Upload audio file and get transcribed text\nUpload audio file and get transcribed text using Whisper API",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Conversation"
+                ],
+                "summary": "Convert speech to text",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Audio file to transcribe",
+                        "name": "audio",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns transcribed text and filename",
+                        "schema": {
+                            "$ref": "#/definitions/model.STTResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/guest/conversation/demo-chat": {
+            "post": {
+                "description": "Limited chat functionality for non-logged-in users (demo/trial)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "Demo chat conversation for guests",
+                "parameters": [
+                    {
+                        "description": "Demo chat request with limited messages",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Demo response with limited functionality",
+                        "schema": {
+                            "$ref": "#/definitions/model.ChatResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Rate limit exceeded",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/guest/conversation/speech-to-text": {
+            "post": {
+                "description": "Limited speech-to-text functionality for non-logged-in users (demo/trial)",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Demo"
+                ],
+                "summary": "Demo speech-to-text for guests",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Audio file to transcribe",
+                        "name": "audio",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns transcribed text and filename",
+                        "schema": {
+                            "$ref": "#/definitions/model.STTResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/public/register-user": {
+            "post": {
+                "description": "Register or update user information from external OAuth system (Google, etc.)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Register user from external OAuth system",
+                "parameters": [
+                    {
+                        "description": "User registration data from OAuth system",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.RegisterUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User registered/updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/controller.RegisterUserResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "New user created successfully",
+                        "schema": {
+                            "$ref": "#/definitions/controller.RegisterUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controller.RegisterUserRequest": {
+            "type": "object",
+            "required": [
+                "display_name",
+                "email",
+                "user_id"
+            ],
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "display_name": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "google_id": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.RegisterUserResponse": {
+            "type": "object",
+            "properties": {
+                "is_new_user": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ChatRequest": {
+            "type": "object",
+            "required": [
+                "messages"
+            ],
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.GPTMessage"
+                    }
+                },
+                "thread_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                }
+            }
+        },
+        "model.ChatResponse": {
+            "type": "object",
+            "properties": {
+                "cached": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "reply": {
+                    "type": "string",
+                    "example": "Hello! How can I help you with your eye examination today?"
+                },
+                "thread_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                }
+            }
+        },
+        "model.GPTMessage": {
+            "type": "object",
+            "required": [
+                "content",
+                "role"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Hello, how are you?"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "assistant",
+                        "system"
+                    ],
+                    "example": "user"
+                }
+            }
+        },
+        "model.STTResponse": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string",
+                    "example": "audio.wav"
+                },
+                "text": {
+                    "type": "string",
+                    "example": "Hello, I would like to book an eye examination"
+                }
+            }
+        }
+    }
+}
