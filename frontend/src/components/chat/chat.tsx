@@ -11,10 +11,15 @@ import { Message } from "./message";
 import { v4 as uuidv4 } from "uuid";
 import { TypingIndicator } from "./typing-indicator";
 import { useChatStore } from "@/store/use-chat-store";
-import Image from "next/image";
 
 export function Chat() {
-  const { threadId, setThreadId, messages, setMessages } = useChatStore();
+  const {
+    threadId,
+    setThreadId,
+    messages,
+    setMessages,
+    generateWelcomeMessage,
+  } = useChatStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -35,12 +40,8 @@ export function Chat() {
       messages[0].timestamp === "2024-01-01T00:00:00.000Z" &&
       localStorage.getItem("chat-storage") === null
     ) {
-      setMessages([
-        {
-          ...messages[0],
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      const welcomeMessage = generateWelcomeMessage();
+      setMessages([welcomeMessage]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -94,30 +95,22 @@ export function Chat() {
   };
 
   const handleReset = () => {
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content:
-          "สวัสดีค่ะ ฉันคือ Khun HR ผู้ช่วยสัมภาษณ์อัจฉริยะจากนกแอร์ ยินดีต้อนรับและขอขอบคุณที่ให้ความสนใจร่วมงานกับเรา ก่อนที่เราจะเริ่มพูดคุยกันอย่างเป็นทางการ ขอทราบชื่อ-นามสกุล ตำแหน่งที่คุณสนใจ และเหตุผลที่เลือกสมัครกับนกแอร์หน่อยได้ไหมคะ? อยากให้วันนี้เป็นการพูดคุยที่สบายๆ เหมือนนั่งคุยกันบนเครื่องบินเลยค่ะ",
-        timestamp: new Date().toISOString(),
-      },
-    ]);
+    const welcomeMessage = generateWelcomeMessage();
+    setMessages([welcomeMessage]);
     setError(null);
     setThreadId("");
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] relative bg-[#fffbe6]">
-      {/* พื้นหลังเครื่องบินจางๆ */}
-      <Image
-        src="/plane.jpg"
-        alt="Nok Air Plane"
-        fill
-        className="object-cover opacity-10 pointer-events-none select-none z-0"
-        style={{ objectPosition: "center" }}
-        priority
-      />
+    <div className="flex flex-col h-[100dvh] relative bg-gradient-to-br from-[#f1e6f0] via-[#f8f0f5] to-[#e8d5f0]">
+      {/* พื้นหลังแบบ Playful */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Decorative shapes */}
+        <div className="absolute top-20 left-10 w-16 h-16 bg-[#f28b1b]/20 rounded-full animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-12 h-12 bg-[#5c4394]/20 rounded-full animate-bounce delay-300"></div>
+        <div className="absolute bottom-40 left-20 w-20 h-20 bg-[#f28b1b]/10 rounded-full animate-pulse delay-700"></div>
+        <div className="absolute bottom-20 right-10 w-14 h-14 bg-[#5c4394]/15 rounded-full animate-bounce delay-1000"></div>
+      </div>
       <div className="relative z-10 h-full flex flex-col">
         <ChatHeader onReset={handleReset} />
         <div className="flex-1 overflow-y-auto">

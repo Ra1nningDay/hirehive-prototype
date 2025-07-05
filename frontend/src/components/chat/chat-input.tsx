@@ -47,60 +47,62 @@ export function ChatInput({ onSend, isLoading }: ChatInputProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 sticky bottom-0"
+      className="border-t-4 border-[#f28b1b] bg-white/90 backdrop-blur-lg p-6 sticky bottom-0 shadow-2xl"
     >
-      <div className="flex gap-2 items-end max-w-3xl mx-auto">
+      <div className="flex gap-3 items-end max-w-4xl mx-auto">
         <div className="relative flex-1">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="พิมพ์ข้อความ หรือกดปุ่มไมค์เพื่อพูด..." // --- (Optional) เพิ่มคำแนะนำเล็กน้อย ---
-            className="min-h-[60px] resize-none pr-16"
+            placeholder="🎮 Type your message or press mic to start the game! 🎯"
+            className="min-h-[60px] resize-none pr-16 rounded-2xl border-2 border-[#5c4394]/30 focus:border-[#f28b1b] transition-all duration-300 text-base font-medium shadow-lg"
             maxLength={1000}
-            disabled={isLoading || isUploading || isRecording} // --- (Optional) ปิดใช้งาน Textarea ตอนบันทึก ---
+            disabled={isLoading || isUploading || isRecording}
           />
           <button
             type="button"
             onClick={handleMicClick}
             disabled={isLoading || isUploading}
-            // --- 2. ปรับปรุง className ---
-            className={`absolute bottom-2 right-2 h-10 w-10 flex items-center justify-center rounded-full transition-colors z-10 shadow-md border ${
+            className={`absolute bottom-2 right-2 h-12 w-12 flex items-center justify-center rounded-full transition-all duration-300 z-10 shadow-lg border-2 transform hover:scale-110 ${
               isRecording
-                ? "bg-red-500 border-red-600 animate-pulse hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400" // --- สีแดง + Pulse ---
-                : "bg-white border-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-300" // --- สีปกติ ---
+                ? "bg-red-500 border-red-600 animate-pulse hover:bg-red-600 shadow-red-300"
+                : "bg-gradient-to-r from-[#f28b1b] to-[#ff9d3a] border-[#f28b1b] hover:from-[#ff9d3a] hover:to-[#f28b1b] shadow-orange-300"
             }`}
             aria-label={isRecording ? "Stop recording" : "Start recording"}
           >
-            {/* --- 3. เปลี่ยนไอคอนตามสถานะ --- */}
             {isRecording ? (
-              <StopCircle className="h-5 w-5 text-white" /> // --- ไอคอน Stop สีขาว ---
+              <StopCircle className="h-6 w-6 text-white animate-pulse" />
             ) : (
-              <Mic className="h-5 w-5 text-gray-700" /> // --- ไอคอน Mic สีเทา ---
+              <Mic className="h-6 w-6 text-white" />
             )}
           </button>
         </div>
         <Button
           type="submit"
           size="icon"
-          disabled={!input.trim() || isLoading || isUploading || isRecording} // --- ปิดใช้งานตอนบันทึก ---
-          className="h-[60px] w-[60px] shrink-0"
+          disabled={!input.trim() || isLoading || isUploading || isRecording}
+          className="h-[60px] w-[60px] shrink-0 bg-gradient-to-r from-[#5c4394] to-[#7b5bb0] hover:from-[#7b5bb0] hover:to-[#5c4394] text-white rounded-2xl shadow-lg transform transition-all duration-300 hover:scale-110 border-2 border-[#5c4394]"
         >
-          <Send className="h-5 w-5" />
+          <Send className="h-6 w-6" />
           <span className="sr-only">Send message</span>
         </Button>
         <audio ref={audioRef} hidden />
       </div>
-      {/* --- (Optional) 4. เพิ่มข้อความบอกสถานะ --- */}
+      {/* Game-style Status Messages */}
       {isRecording && (
-        <p className="text-center text-red-500 text-xs mt-1 animate-pulse">
-          กำลังบันทึกเสียง... กดปุ่มสีแดงเพื่อหยุด
-        </p>
+        <div className="text-center mt-3">
+          <p className="text-red-500 text-sm font-bold animate-pulse bg-red-50 px-4 py-2 rounded-full inline-block border-2 border-red-200">
+            🎤 Recording... Press red button to stop
+          </p>
+        </div>
       )}
       {isUploading && (
-        <p className="text-center text-gray-500 text-xs mt-1">
-          กำลังประมวลผลเสียง...
-        </p>
+        <div className="text-center mt-3">
+          <p className="text-[#5c4394] text-sm font-bold bg-purple-50 px-4 py-2 rounded-full inline-block border-2 border-purple-200">
+            ⚡ Processing audio...
+          </p>
+        </div>
       )}
     </form>
   );
